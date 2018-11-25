@@ -155,8 +155,8 @@ BEGIN
         BEGIN
             VALUE "FileDescription", "CommTool工具"
             VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "COMTOOL"
-            VALUE "LegalCopyright", "版权所有 (C) 2005"
+            VALUE "InternalName", "CommTool"
+            VALUE "LegalCopyright", "版权所有 (C) 2018"
             VALUE "OriginalFilename", "CommTool.EXE"
             VALUE "ProductName", "CommTool工具"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -179,7 +179,6 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
-        , 50
     END
 
     IDD_COMMTOOL_DIALOG, DIALOG
@@ -212,7 +211,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ABOUTBOX            "关于 COMTOOL(&A)..."
+    IDS_ABOUTBOX            "关于 CommTool(&A)..."
 END
 
 #endif    // Chinese (Simplified, PRC) resources
