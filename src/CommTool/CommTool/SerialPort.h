@@ -27,7 +27,7 @@
 #define WM_COMM_RXCHAR				WM_USER+7	// A character was received and placed in the input buffer. 
 #define WM_COMM_RXFLAG_DETECTED		WM_USER+8	// The event character was received and placed in the input buffer.  
 #define WM_COMM_TXEMPTY_DETECTED	WM_USER+9	// The last character in the output buffer was sent.  
-#define MaxSerialPortNum			11
+#define MaxSerialPortNum			1024
 
 class CSerialPort
 {														 

@@ -131,7 +131,7 @@ BOOL CSerialPort::InitPort(CWnd* pPortOwner,	// the owner (CWnd) of the port (re
 	}
 
 	// prepare port strings
-	wsprintf(tzPort, _T("COM%d"), portnr);
+	wsprintf(tzPort, _T("\\\\.\\COM%d"), portnr);
 	wsprintf(tzBaud, _T("baud=%d parity=%c data=%d stop=%d"), baud, parity, databits, stopbits);
 
 	// get a handle to the port
