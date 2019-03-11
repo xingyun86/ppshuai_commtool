@@ -20,8 +20,6 @@
 
 #include <assert.h>
 
-//User defined
-int m_nDataLength; 
 //
 // Constructor
 //
@@ -343,7 +341,7 @@ UINT CSerialPort::CommThread(LPVOID pParam)
 		case 2: // write event
 			{
 				// Write character event from port
-				WriteChar(port,m_nDataLength);
+				WriteChar(port);
 				break;
 			}
 
@@ -417,7 +415,7 @@ void CSerialPort::ProcessErrorMessage(LPCTSTR lpErrorText)
 //
 // Write a character.
 //
-void CSerialPort::WriteChar(CSerialPort* port,int length)
+void CSerialPort::WriteChar(CSerialPort* port)
 {
 	BOOL bWrite = TRUE;
 	BOOL bResult = TRUE;
@@ -440,8 +438,7 @@ void CSerialPort::WriteChar(CSerialPort* port,int length)
 
 		bResult = WriteFile(port->m_hComm,							// Handle to COMM Port
 							port->m_szWriteBuffer,					// Pointer to message buffer in calling finction
-							length,									// Length of message to send
-							//strlen((char*)port->m_szWriteBuffer),
+							port->m_nWriteBufferLength,				// Length of message to send
 							&BytesSent,								// Where to store the number of bytes sent
 							&port->m_ov);							// Overlapped structure
 
@@ -490,9 +487,9 @@ void CSerialPort::WriteChar(CSerialPort* port,int length)
 	} // end if (!bWrite)
 
 	// Verify that the data size send equals what we tried to send
-	if (BytesSent != strlen((char*)port->m_szWriteBuffer))
+	if (BytesSent != port->m_nWriteBufferLength)
 	{
-		TRACE("WARNING: WriteFile() error.. Bytes Sent: %d; Message Length: %d\n", BytesSent, strlen((char*)port->m_szWriteBuffer));
+		TRACE("WARNING: WriteFile() error.. Bytes Sent: %d; Message Length: %d\n", BytesSent, port->m_nWriteBufferLength);
 	}
 }
 
@@ -600,11 +597,12 @@ void CSerialPort::ReceiveChar(CSerialPort* port, COMSTAT comstat)
 //
 // Write a string to the port
 //
-void CSerialPort::WriteToPort(char* string)
+void CSerialPort::WriteToPort(CHAR* string)
 {		
 	assert(m_hComm != 0);
 
 	memset(m_szWriteBuffer, 0, sizeof(m_szWriteBuffer));
+	m_nWriteBufferLength = strlen(string);
 	strcpy(m_szWriteBuffer, string);
 
 	// set event for write
@@ -614,17 +612,14 @@ void CSerialPort::WriteToPort(char* string)
 //
 // Write a string with fixed length to the port
 //
-void CSerialPort::WriteToPort(char* string,int length)
+void CSerialPort::WriteToPort(CHAR* string, DWORD length)
 {		
 	assert(m_hComm != 0);
-	
-	m_nDataLength=length;
-	
+		
 	memset(m_szWriteBuffer, 0, sizeof(m_szWriteBuffer));
+	m_nWriteBufferLength = length;
+	memcpy(m_szWriteBuffer, string, m_nWriteBufferLength);
 
-	for(int i=0;i<length;i++)
-		m_szWriteBuffer[i]=string[i];
-	
 	// set event for write
 	SetEvent(m_hWriteEvent);
 }

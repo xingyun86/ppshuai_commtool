@@ -306,23 +306,23 @@ void CCOMTOOLDlg::OnQuit()
 void CCOMTOOLDlg::OnClearSendEdit() 
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
+	UpdateData(TRUE);
 	m_strSend=_T("");
-	UpdateData(false);
+	UpdateData(FALSE);
 }
 
 void CCOMTOOLDlg::OnClearReceiveEdit() 
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
+	UpdateData(TRUE);
 	m_strReceive=_T("");
-	UpdateData(false);
+	UpdateData(FALSE);
 }
 
 void CCOMTOOLDlg::OnBAutoSend() 
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
+	UpdateData(TRUE);
 	m_SendPeriodCtrl.EnableWindow(m_bAutoSend);
 	if(m_bAutoSend)	
 	{
@@ -340,13 +340,13 @@ void CCOMTOOLDlg::OnOpenClose()
 	// TODO: Add your control notification handler code here
 	CString temp;
 	m_OpenCloseCtrl.GetWindowText(temp);
-	UpdateData(true);
+	UpdateData(TRUE);
 	if(temp==_T("关闭串口"))
 	{
 		m_SerialPort.InitPort(this,MaxSerialPortNum);
 		m_OpenCloseCtrl.SetWindowText(_T("打开串口"));
 		m_strStatus=_T("关闭");
-		UpdateData(false);
+		UpdateData(FALSE);
 		m_DescriptionCtrl.SetWindowText(_T(""));
 		m_SendCtrl.GetWindowText(temp);
 		if(temp== _T("停止自动发送"))
@@ -359,7 +359,7 @@ void CCOMTOOLDlg::OnOpenClose()
 	{	
 		int SelPortNO,SelBaudRate,SelDataBits,SelStopBits;
 		char SelParity;
-		UpdateData(true);
+		UpdateData(TRUE);
 		temp=m_strPortNO;
 		temp.Delete(0,3);
 		SelPortNO= _ttoi(temp);
@@ -372,7 +372,7 @@ void CCOMTOOLDlg::OnOpenClose()
 			m_SerialPort.StartMonitoring();
 			m_OpenCloseCtrl.SetWindowText(_T("关闭串口"));
 			m_strStatus=_T("打开");
-			UpdateData(false);
+			UpdateData(FALSE);
 			temp=m_strPortNO+_T("  , 波特率:  ")+m_strBaudRate+_T("bps, 校验位:  ")+m_strParity+
 				_T(", 数据为:  ")+m_strDataBits+_T(" , 停止位:  ")+m_strStopBits;
 			m_DescriptionCtrl.SetWindowText(temp);
@@ -385,12 +385,12 @@ void CCOMTOOLDlg::OnOpenClose()
 void CCOMTOOLDlg::OnClearCounter() 
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
+	UpdateData(TRUE);
 	m_nSendBytes=0;
 	m_nReceiveBytes=0;
 	m_strSendBytes=_T("0");
 	m_strReceiveBytes=_T("0");
-	UpdateData(false);
+	UpdateData(FALSE);
 }
 
 
@@ -398,7 +398,7 @@ void CCOMTOOLDlg::OnSend()
 {
 	// TODO: Add your control notification handler code here
 	CString temp;
-	UpdateData(true);
+	UpdateData(TRUE);
 	if(m_strStatus==_T("关闭"))
 	{
 		AfxMessageBox(_T("请首先打开串口"));
@@ -407,12 +407,14 @@ void CCOMTOOLDlg::OnSend()
 	if(!m_bAutoSend)
 	{	
 		temp=m_strSend;
-		if(m_bHexS)
-		temp=ChangeCharstr2Hexstr(temp);
-		m_SerialPort.WriteToPort((LPSTR)(LPCSTR)CStringA(temp),temp.GetLength());
+		if (m_bHexS)
+		{
+			temp = ChangeCharstr2Hexstr(temp);
+		}
+		m_SerialPort.WriteToPort((LPTSTR)(LPCTSTR)CString(temp),temp.GetLength());
 		m_nSendBytes+=temp.GetLength();
 		m_strSendBytes.Format(_T("%d"),m_nSendBytes);
-		UpdateData(false);
+		UpdateData(FALSE);
 	}
 	else 
 	{
@@ -421,7 +423,7 @@ void CCOMTOOLDlg::OnSend()
 		{
 			KillTimer(1);
 			m_SendCtrl.SetWindowText(_T("开始自动发送"));
-			UpdateData(false);
+			UpdateData(FALSE);
 		}
 		else
 		{
@@ -436,30 +438,36 @@ void CCOMTOOLDlg::OnSend()
 void CCOMTOOLDlg::OnTimer(UINT nIDEvent) 
 {
 	// TODO: Add your message handler code here and/or call default
-	UpdateData(true);
+	UpdateData(TRUE);
 	CString temp;
 	temp=m_strSend;
-	if(m_bHexS)
-		temp=ChangeCharstr2Hexstr(temp);
-	m_SerialPort.WriteToPort((LPSTR)(LPCSTR)CStringA(temp),temp.GetLength());
+	if (m_bHexS)
+	{
+		temp = ChangeCharstr2Hexstr(temp);
+	}
+	m_SerialPort.WriteToPort((LPTSTR)(LPCTSTR)CString(temp),temp.GetLength());
 	m_nSendBytes+=temp.GetLength();
 	m_strSendBytes.Format(_T("%d"),m_nSendBytes);
-	UpdateData(false);
+	UpdateData(FALSE);
 	CDialog::OnTimer(nIDEvent);
 }
 
 LRESULT CCOMTOOLDlg::OnReceiveChar(UINT ch, LONG port)
 {
-	UpdateData(true);
+	UpdateData(TRUE);
 	m_nReceiveBytes++;
 	CString temp;
 	temp.Format(_T("%d"),m_nReceiveBytes);
 	m_strReceiveBytes=temp;
-	if(m_bHexR)
-		m_strReceive+=DevideHexChar(ch)+_T(" ");
+	if (m_bHexR)
+	{
+		m_strReceive += DevideHexChar(ch) + _T(" ");
+	}
 	else
+	{
 		m_strReceive.AppendChar(ch);
-	UpdateData(false);
+	}
+	UpdateData(FALSE);
 
 	((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineScroll(
 		m_strReceive.GetLength()/(((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineLength()));
@@ -470,37 +478,51 @@ LRESULT CCOMTOOLDlg::OnReceiveChar(UINT ch, LONG port)
 CString CCOMTOOLDlg::ChangeCharstr2Hexstr(CString Charstr)
 {
 	CString Hexstr=_T("");
+	//CHAR czChar[] = "\x00\x00\x00";
 	Charstr.MakeUpper();
 	HexStringFilter(Charstr);
 	int Length=Charstr.GetLength();
-	if(Length%2)
-		Charstr.Delete(Length-1);
-	Length=Charstr.GetLength();
-	for(int i=0;i<Length/2;i++)
+	if (Length % 2)
 	{
-		Hexstr+=CombineHexChar(Charstr.GetAt(i*2),Charstr.GetAt(i*2+1));
+		Charstr.Delete(Length - 1);
+	}
+	Length=Charstr.GetLength();
+	for(int i=0;i<Length;i+=2)
+	{
+		Hexstr+=CombineHexChar(Charstr.GetAt(i),Charstr.GetAt(i+1));
+		/**(czChar + 0) = (BYTE)((LPCTSTR)CString(Charstr))[i];
+		*(czChar + 1) = (BYTE)((LPCTSTR)CString(Charstr))[i + 1];
+		Hexstr.AppendChar((BYTE)strtoul(czChar, NULL, 0x10));*/
 	}
 	return Hexstr;
 }
 
-void CCOMTOOLDlg::OnBHexS() 
+void CCOMTOOLDlg::OnBHexS()
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
-	if(m_bHexS)
-		GetDlgItem(IDC_SendEdit)->ModifyStyle(0,ES_UPPERCASE,0);
+	UpdateData(TRUE);
+	if (m_bHexS)
+	{
+		GetDlgItem(IDC_SendEdit)->ModifyStyle(0, ES_UPPERCASE, 0);
+	}
 	else
-		GetDlgItem(IDC_SendEdit)->ModifyStyle(ES_UPPERCASE,0,0);
+	{
+		GetDlgItem(IDC_SendEdit)->ModifyStyle(ES_UPPERCASE, 0, 0);
+	}
 }
 
-void CCOMTOOLDlg::OnBHexR() 
+void CCOMTOOLDlg::OnBHexR()
 {
 	// TODO: Add your control notification handler code here
-	UpdateData(true);
-	if(m_bHexR)
-		GetDlgItem(IDC_ReceiveEdit)->ModifyStyle(0,ES_UPPERCASE,0);
+	UpdateData(TRUE);
+	if (m_bHexR)
+	{
+		GetDlgItem(IDC_ReceiveEdit)->ModifyStyle(0, ES_UPPERCASE, 0);
+	}
 	else
-		GetDlgItem(IDC_ReceiveEdit)->ModifyStyle(ES_UPPERCASE,0,0);
+	{
+		GetDlgItem(IDC_ReceiveEdit)->ModifyStyle(ES_UPPERCASE, 0, 0);
+	}
 }
 
 void CCOMTOOLDlg::HexStringFilter(CString &str)
@@ -511,9 +533,14 @@ void CCOMTOOLDlg::HexStringFilter(CString &str)
 		bOK=((str.GetAt(i)>= _T('0'))&&(str.GetAt(i)<= _T('9')))||
 			((str.GetAt(i)>= _T('A'))&&(str.GetAt(i)<= _T('F')))||
 			((str.GetAt(i)>= _T('a'))&&(str.GetAt(i)<= _T('f')));
-		if(!bOK)
+		if (!bOK)
+		{
 			str.Delete(i);
-		else i++;	
+		}
+		else 
+		{
+			i++;
+		}
 	}
 }
 char CCOMTOOLDlg::CombineHexChar(char CharH,char CharL)

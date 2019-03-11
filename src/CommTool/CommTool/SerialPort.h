@@ -38,7 +38,7 @@ public:
 	virtual		~CSerialPort();
 
 	// port initialisation											
-	BOOL		InitPort(CWnd* pPortOwner, UINT portnr = 1, UINT baud = 9600, char parity = 'N', UINT databits = 8, UINT stopsbits = 1, DWORD dwCommEvents = EV_RXCHAR|EV_CTS, UINT nBufferSize = 512);
+	BOOL		InitPort(CWnd* pPortOwner, UINT portnr = 1, UINT baud = 9600, char parity = 'N', UINT databits = 8, UINT stopsbits = 1, DWORD dwCommEvents = EV_RXCHAR|EV_CTS, UINT nBufferSize = USHORT_MAX);
 
 	// start/stop comm watching
 	BOOL		StartMonitoring();
@@ -49,14 +49,14 @@ public:
 	DWORD		GetCommEvents();
 	DCB			GetDCB();
 
-	void		WriteToPort(char* string);
-	void		WriteToPort(char* string,int length);
+	void		WriteToPort(CHAR* string);
+	void		WriteToPort(CHAR* string, DWORD length);
 protected:
 	// protected memberfunctions
 	void		ProcessErrorMessage(LPCTSTR lpErrorText);
 	static UINT	CommThread(LPVOID pParam);
 	static void	ReceiveChar(CSerialPort* port, COMSTAT comstat);
-	static void	WriteChar(CSerialPort* port,int length);
+	static void	WriteChar(CSerialPort* port);
 
 	// thread
 	CWinThread*			m_Thread;
@@ -86,7 +86,8 @@ protected:
 
 	// misc
 	UINT				m_nPortNr;
-	char*				m_szWriteBuffer;
+	CHAR*				m_szWriteBuffer;
+	DWORD				m_nWriteBufferLength;
 	DWORD				m_dwCommEvents;
 	DWORD				m_nWriteBufferSize;
 };
