@@ -35,9 +35,7 @@ CSerialPort::CSerialPort()
 	m_ov.hEvent = NULL;
 	m_hWriteEvent = NULL;
 	m_hShutdownEvent = NULL;
-
-	m_szWriteBuffer = NULL;
-
+	
 	m_bThreadAlive = FALSE;
 }
 
@@ -52,8 +50,6 @@ CSerialPort::~CSerialPort()
 	} while (m_bThreadAlive);
 
 	TRACE("Thread ended\n");
-
-	delete [] m_szWriteBuffer;
 }
 
 //
@@ -104,10 +100,6 @@ BOOL CSerialPort::InitPort(CWnd* pPortOwner,	// the owner (CWnd) of the port (re
 	
 	// set buffersize for writing and save the owner
 	m_pOwner = pPortOwner;
-
-	if (m_szWriteBuffer != NULL)
-		delete [] m_szWriteBuffer;
-	m_szWriteBuffer = new char[writebuffersize];
 
 	m_nPortNr = portnr;
 
@@ -210,13 +202,14 @@ UINT CSerialPort::CommThread(LPVOID pParam)
 	DWORD Event = 0;
 	DWORD CommEvent = 0;
 	DWORD dwError = 0;
-	COMSTAT comstat;
+	COMSTAT comstat = { 0 };
 	BOOL  bResult = TRUE;
 		
 	// Clear comm buffers at startup
 	if (port->m_hComm)		// check if the port is opened
+	{
 		PurgeComm(port->m_hComm, PURGE_RXCLEAR | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_TXABORT);
-
+	}
 	// begin forever loop.  This loop will run as long as the thread is alive.
 	for (;;) 
 	{ 
@@ -333,9 +326,10 @@ UINT CSerialPort::CommThread(LPVOID pParam)
 					::SendMessage(port->m_pOwner->m_hWnd, WM_COMM_RING_DETECTED, (WPARAM) 0, (LPARAM) port->m_nPortNr);
 				
 				if (CommEvent & EV_RXCHAR)
+				{
 					// Receive character event from port.
 					ReceiveChar(port, comstat);
-					
+				}
 				break;
 			}  
 		case 2: // write event
@@ -502,7 +496,7 @@ void CSerialPort::ReceiveChar(CSerialPort* port, COMSTAT comstat)
 	BOOL  bResult = TRUE;
 	DWORD dwError = 0;
 	DWORD BytesRead = 0;
-	unsigned char RXBuff;
+	unsigned char RXBuff = 0x00;
 
 	for (;;) 
 	{ 

@@ -176,6 +176,7 @@ BOOL CCOMTOOLDlg::OnInitDialog()
 	m_SendPeriodCtrl.EnableWindow(m_bAutoSend);
 	m_OpenCloseCtrl.SetWindowText(_T("´ò¿ª´®¿Ú"));
 	m_DescriptionCtrl.SetWindowText(_T(""));
+	((CEdit*)GetDlgItem(IDC_SendEdit))->SetLimitText(USHORT_MAX);
 	if(m_bHexS)
 		GetDlgItem(IDC_SendEdit)->ModifyStyle(0,ES_UPPERCASE,0);
 	else
@@ -465,12 +466,18 @@ LRESULT CCOMTOOLDlg::OnReceiveChar(UINT ch, LONG port)
 	}
 	else
 	{
+		if (ch == 0x00)
+		{
+			ch = 0x20;
+		}
 		m_strReceive.AppendChar(ch);
 	}
 	UpdateData(FALSE);
-
-	((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineScroll(
-		m_strReceive.GetLength()/(((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineLength()));
+	if (m_strReceive.GetLength())
+	{
+		((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineScroll(
+			m_strReceive.GetLength()/(((CEdit*)GetDlgItem(IDC_ReceiveEdit))->LineLength()));
+	}
 
 	return 0;
 }

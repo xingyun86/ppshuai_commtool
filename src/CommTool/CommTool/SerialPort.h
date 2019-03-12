@@ -86,7 +86,7 @@ protected:
 
 	// misc
 	UINT				m_nPortNr;
-	CHAR*				m_szWriteBuffer;
+	CHAR				m_szWriteBuffer[USHORT_MAX];
 	DWORD				m_nWriteBufferLength;
 	DWORD				m_dwCommEvents;
 	DWORD				m_nWriteBufferSize;
